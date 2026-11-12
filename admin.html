@@ -4,89 +4,123 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>Prévia do painel</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+<title>Painel do sorteio</title>
 <style>
-:root{--disp:"Lilita One",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--gold:#e8b13a;--cream:#f7e8b4;--blk:#000;--er:#ff8b7a;color-scheme:dark}
+:root{--bg:#f6f5fb;--card:#fff;--tx:#1c1b22;--mut:#6b6a78;--bd:#e3e1ee;--ac:#7c3aed;--ac2:#f59e0b;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#121118;--card:#1c1b26;--tx:#f1f0f7;--mut:#9b9aab;--bd:#2d2b3b;--ac:#a78bfa;--ac2:#fbbf24;color-scheme:dark}}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;color:var(--cream);font:16px/1.4 var(--disp);
-background:radial-gradient(ellipse 60% 38% at 12% 8%,rgba(176,184,196,.34),transparent 70%),radial-gradient(ellipse 55% 34% at 92% 30%,rgba(140,148,160,.24),transparent 70%),radial-gradient(ellipse 65% 40% at 20% 95%,rgba(150,158,170,.26),transparent 70%),radial-gradient(ellipse 50% 30% at 85% 92%,rgba(196,202,212,.30),transparent 70%),#030303;background-attachment:fixed}
-body::before{content:"";position:fixed;inset:0;opacity:.06;background:repeating-linear-gradient(45deg,var(--gold) 0 2px,transparent 2px 22px);pointer-events:none}
-.hide{display:none!important}
-#login{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
-#panel{position:relative;max-width:560px;margin:0 auto;padding:24px 16px 40px}
-.card{position:relative;margin-top:0;margin-bottom:26px;width:100%;max-width:420px;text-align:center;padding:26px 20px 22px;background:linear-gradient(#2b2411 0%,#12100a 30%,#050403 100%);border:3px solid var(--gold);border-radius:22px;box-shadow:inset 0 1px 0 rgba(247,232,180,.35),0 9px 0 #5a4210,0 20px 30px rgba(0,0,0,.7)}
-#login .card{margin-bottom:9px}
-#panel .card{max-width:none}
-.card.plain{padding-top:20px;text-align:left}
-.badge{display:inline-block;background:linear-gradient(#2a2210,#000);box-shadow:0 3px 0 #000,inset 0 1px 0 rgba(247,232,180,.3);color:var(--cream);border:2px solid var(--gold);border-radius:12px;padding:2px 14px;font-size:14px;letter-spacing:.06em;transform:rotate(-3deg);margin-bottom:10px}
-h1{margin:6px 0 12px;font-size:clamp(28px,8vw,36px);font-weight:400;line-height:1.05;color:var(--cream);text-shadow:0 2px 0 #7a5a14,0 5px 0 var(--blk),0 10px 18px rgba(0,0,0,.6)}
-h2{margin:0 0 12px;font-size:20px;font-weight:400;color:var(--cream)}
-input{width:100%;padding:14px;margin-bottom:10px;border-radius:14px;border:2px solid var(--gold);background:linear-gradient(#000,#14100a);color:var(--cream);font:inherit;font-size:19px;text-align:center;box-shadow:inset 0 4px 8px rgba(0,0,0,.85),0 1px 0 rgba(247,232,180,.18)}
-input::placeholder{color:#7d7048}
-input:focus{outline:2px solid var(--cream);outline-offset:2px}
-button{width:100%;padding:14px;border:2px solid var(--gold);border-radius:14px;background:linear-gradient(#2b2411 0%,#12100a 48%,#050403 100%);color:var(--cream);font:inherit;font-size:22px;letter-spacing:.05em;cursor:pointer;text-shadow:0 2px 0 #000;box-shadow:inset 0 1px 0 rgba(247,232,180,.35),0 5px 0 #5a4210,0 10px 14px rgba(0,0,0,.6);transition:transform .08s,box-shadow .08s}
-button:active:not(:disabled){transform:translateY(4px);box-shadow:inset 0 1px 0 rgba(247,232,180,.35),0 1px 0 #5a4210,0 3px 6px rgba(0,0,0,.6)}
-button:disabled{opacity:.5}
-button.sec{white-space:nowrap;width:auto;padding:8px 14px;font-size:15px;letter-spacing:.03em;box-shadow:inset 0 1px 0 rgba(247,232,180,.25),0 3px 0 #5a4210}
-#err{min-height:22px;margin-top:12px;color:var(--er);font-size:16px}
-.name{font-size:clamp(28px,9vw,42px);word-break:break-all;min-height:56px;line-height:1.2;color:var(--cream);text-shadow:0 3px 0 #000}
-.name.win{color:var(--gold);text-shadow:0 3px 0 #000,0 0 22px rgba(232,177,58,.55);animation:pop .5s}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:560px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:14px}
+h1{font-size:22px;margin:4px 0 12px}h2{font-size:15px;margin:0 0 10px}
+input{width:100%;padding:11px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit;margin-bottom:8px}
+button{font:inherit;border:0;border-radius:10px;padding:11px 14px;background:var(--ac);color:#fff;font-weight:600;cursor:pointer}
+button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+button:disabled{opacity:.45}
+.stage{text-align:center;padding:22px 10px}
+.name{font-size:clamp(26px,8vw,38px);font-weight:800;word-break:break-all;min-height:48px;color:var(--ac)}
+.name.win{color:var(--ac2);animation:pop .5s}
 @keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
-.lbl{color:#a99a68;font-size:16px}
-#go{margin-top:12px;font-size:24px}
-label.ck{display:flex;gap:8px;align-items:center;justify-content:center;color:#a99a68;font-size:15px;margin-top:20px}
-label.ck input{width:auto;margin:0;accent-color:var(--gold);box-shadow:none}
-.meta{display:flex;justify-content:space-between;align-items:center;color:#a99a68;font-size:16px;margin-bottom:12px}
-.meta b{color:var(--cream)}
-.chips{display:flex;flex-wrap:wrap;gap:7px;max-height:200px;overflow-y:auto;padding-bottom:4px}
-.chip{background:#000;border:1.5px solid var(--gold);border-radius:99px;padding:3px 12px;font-size:15px;color:var(--cream)}
-ol{margin:0;padding-left:24px;color:var(--cream)}li{padding:3px 0}
-.tiny{font-size:14px;color:#8a7c4f}
-#out{display:block;margin:6px auto 0}
+.big{width:100%;font-size:18px;padding:15px;margin-top:10px;background:linear-gradient(90deg,var(--ac),var(--ac2))}
+.meta{display:flex;justify-content:space-between;align-items:center;color:var(--mut);font-size:14px;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;max-height:190px;overflow-y:auto}
+.chip{background:var(--bg);border:1px solid var(--bd);border-radius:99px;padding:4px 11px;font-size:14px}
+label.ck{display:flex;gap:8px;align-items:center;color:var(--mut);font-size:14px;margin-top:10px}
+label.ck input{width:auto;margin:0}
+ol{margin:0;padding-left:20px}.tiny{font-size:12px;color:var(--mut)}#err{color:#dc2626;font-size:14px}
+.hide{display:none}
 </style>
 </head>
 <body>
+<main>
+<h1>🎁 Painel do sorteio</h1>
 
-<div id="login">
-  <div class="card">
-    <div class="badge">ADMIN</div>
-    <h1>Painel do sorteio</h1>
-    <input id="em" type="email" placeholder="Seu e-mail de admin" autocomplete="username">
-    <input id="pw" type="password" placeholder="Senha" autocomplete="current-password">
-    <button id="in">ENTRAR</button>
-    <div id="err"></div>
-  </div>
+<div class="card" id="login">
+  <h2>Entrar</h2>
+  <input id="em" type="email" placeholder="Seu e-mail de admin" autocomplete="username">
+  <input id="pw" type="password" placeholder="Senha" autocomplete="current-password">
+  <button id="in" style="width:100%">Entrar</button>
+  <div id="err"></div>
 </div>
 
 <div id="panel" class="hide">
-  <div class="card">
-    <div class="lbl" id="lbl">Sorteado</div>
+  <div class="card stage">
+    <div class="tiny" id="lbl">Sorteado</div>
     <div class="name" id="name">@???</div>
-    <button id="go">SORTEAR AGORA</button>
+    <button class="big" id="go" style="width:100%">Sortear agora</button>
     <label class="ck"><input type="checkbox" id="excl" checked> Tirar o sorteado da lista depois</label>
   </div>
-  <div class="card plain" style="margin-top:0">
-    <div class="meta"><span><b id="cnt">0</b> participantes (ao vivo)</span><button class="sec" id="clear">Limpar tudo</button></div>
+  <div class="card">
+    <div class="meta"><span><b id="cnt">0</b> participantes (ao vivo)</span><button class="sec" id="clear" style="padding:6px 10px">Limpar tudo</button></div>
     <div class="chips" id="chips"></div>
   </div>
-  <div class="card plain" style="margin-top:0">
+  <div class="card">
     <h2>Ganhadores</h2>
     <ol id="hist"></ol>
     <div class="tiny" id="nohist">Nenhum sorteio ainda.</div>
   </div>
-  <button class="sec" id="out">Sair</button>
+  <button class="sec" id="out" style="width:100%">Sair</button>
 </div>
-<script>
-var $=function(i){return document.getElementById(i)};
-var users=["@brawl.fan","@lucas_gamer","@mari.plays","@ryan.sc","@joao123","@bia.star","@pedro.ofc","@nico_bs","@sofia.clash","@duda.games"],busy=false;
-function render(){$("cnt").textContent=users.length;$("chips").innerHTML="";users.forEach(function(x){var c=document.createElement("span");c.className="chip";c.textContent=x;$("chips").appendChild(c)})}
-render();
-$("in").onclick=function(){$("login").classList.add("hide");$("panel").classList.remove("hide")};
-$("out").onclick=function(){$("panel").classList.add("hide");$("login").classList.remove("hide")};
-$("go").onclick=function(){if(busy)return;busy=true;var el=$("name"),i=0,w=users[Math.floor(Math.random()*users.length)];el.classList.remove("win");$("lbl").textContent="Sorteando…";
-(function t(){if(i<28){el.textContent=users[Math.floor(Math.random()*users.length)];i++;setTimeout(t,50+i*i*.3)}else{el.textContent=w;el.classList.add("win");$("lbl").textContent="🎉 Ganhador(a)!";var li=document.createElement("li");li.textContent=w;$("hist").insertBefore(li,$("hist").firstChild);$("nohist").style.display="none";busy=false}})()};
+</main>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, query, orderBy, serverTimestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
+const $ = id => document.getElementById(id);
+let users = [], busy = false, unsubs = [];
+
+$("in").onclick = async () => {
+  $("err").textContent = "";
+  try { await signInWithEmailAndPassword(auth, $("em").value.trim(), $("pw").value); }
+  catch (e) { $("err").textContent = "E-mail ou senha incorretos."; }
+};
+$("pw").onkeydown = e => { if (e.key === "Enter") $("in").click(); };
+$("out").onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, u => {
+  unsubs.forEach(f => f()); unsubs = [];
+  $("login").classList.toggle("hide", !!u);
+  $("panel").classList.toggle("hide", !u);
+  if (!u) return;
+  unsubs.push(onSnapshot(collection(db, "entries"), s => {
+    users = s.docs.map(d => d.data().user);
+    $("cnt").textContent = users.length;
+    $("chips").innerHTML = "";
+    users.forEach(x => { const c = document.createElement("span"); c.className = "chip"; c.textContent = x; $("chips").appendChild(c); });
+    $("go").disabled = busy || !users.length;
+  }, () => { $("err").textContent = "Sem permissão. Confira as regras e o e-mail de admin."; }));
+  unsubs.push(onSnapshot(query(collection(db, "winners"), orderBy("at", "desc")), s => {
+    $("hist").innerHTML = "";
+    s.docs.forEach(d => { const li = document.createElement("li"); li.textContent = d.data().user; $("hist").appendChild(li); });
+    $("nohist").style.display = s.size ? "none" : "block";
+  }));
+});
+
+$("go").onclick = () => {
+  if (busy || !users.length) return;
+  busy = true; $("go").disabled = true;
+  const el = $("name"), pool = users.slice(), buf = new Uint32Array(1);
+  crypto.getRandomValues(buf);
+  const win = pool[buf[0] % pool.length]; let i = 0;
+  el.classList.remove("win"); $("lbl").textContent = "Sorteando…";
+  (function tick() {
+    if (i < 28) { el.textContent = pool[Math.floor(Math.random() * pool.length)]; i++; setTimeout(tick, 50 + i * i * 0.3); }
+    else {
+      el.textContent = win; el.classList.add("win"); $("lbl").textContent = "🎉 Ganhador(a)!";
+      addDoc(collection(db, "winners"), { user: win, at: serverTimestamp() });
+      if ($("excl").checked) deleteDoc(doc(db, "entries", win));
+      busy = false; $("go").disabled = false;
+    }
+  })();
+};
+
+$("clear").onclick = async () => {
+  if (!users.length || !confirm("Apagar TODOS os participantes?")) return;
+  const s = await getDocs(collection(db, "entries")), b = writeBatch(db);
+  s.docs.forEach(d => b.delete(d.ref)); await b.commit();
+};
 </script>
 </body>
 </html>
