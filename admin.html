@@ -46,6 +46,33 @@ ol{margin:0;padding-left:24px;color:var(--cream)}li{padding:3px 0}
 .st{display:none;position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:20;max-width:92%;text-align:center;background:#000;border:2px solid var(--gold);border-radius:14px;padding:10px 18px;font-size:16px;color:var(--cream);box-shadow:0 6px 18px rgba(0,0,0,.7)}
 .st.show{display:block}.st.er{border-color:var(--er);color:var(--er)}
 .fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30}
+.chip{cursor:pointer}
+.chip.sel{background:#2b2411;border-color:var(--cream)}
+.ed{margin-top:14px;padding-top:14px;border-top:1px solid #3a2f12}
+.edrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.row{display:flex;gap:8px;align-items:center}.row input{margin:0;text-align:left;flex:1;min-width:0}
+.prow{display:flex;gap:8px;align-items:center;margin-top:10px}
+.prow input{margin:0;text-align:left;padding:10px 12px;font-size:17px;flex:1;min-width:0}
+.prow button.sec{padding:8px 10px;font-size:14px;flex:none;white-space:nowrap}
+button.sec.tg.on{background:linear-gradient(var(--cream),var(--gold));color:#000;text-shadow:none}
+.recprize{display:none;font-size:20px;color:var(--cream);margin-bottom:8px}
+.recx{display:none;position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:12px;z-index:25;width:auto;padding:8px 12px;font-size:14px;opacity:.75}
+body.rec .recx{display:block}
+body.rec #panel{min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+body.rec #panel>.card:not(#stage),body.rec #out{display:none}
+body.rec #stage #snd,body.rec #stage #rec,body.rec #stage label.ck{display:none}
+body.rec #stage{margin-bottom:0;padding:44px 20px 34px}
+body.rec .recprize.has{display:block}
+body.rec .name{font-size:clamp(38px,13vw,76px);min-height:110px;display:flex;align-items:center;justify-content:center}
+.pcard{margin-top:12px;padding:10px;border:1.5px solid #3a2f12;border-radius:14px;background:#0a0804}
+.ptop{display:flex;gap:10px;align-items:center}
+.ptop input{margin:0;text-align:left;flex:1;min-width:0;padding:10px 12px;font-size:17px}
+.pth{flex:none;width:58px;height:58px;padding:0;border-radius:12px;overflow:hidden;font-size:22px;letter-spacing:0;line-height:1;display:flex;align-items:center;justify-content:center;background:#000;border:2px solid var(--gold);box-shadow:none;text-shadow:none}
+.pth img{width:100%;height:100%;object-fit:cover;display:block}
+.pbot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.pbot .qty{display:flex;align-items:center;gap:6px;color:#a99a68;font-size:15px}
+.pbot .qty input{width:74px;margin:0;padding:8px;font-size:16px;text-align:center}
+.pbot button.sec{padding:8px 10px;font-size:14px;white-space:nowrap}
 .tiny{font-size:14px;color:#8a7c4f}
 #out{display:block;margin:6px auto 0}
 .musbtn{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:25;width:46px;height:46px;margin:0;padding:0;border-radius:50%;font-size:20px;letter-spacing:0;line-height:1;display:flex;align-items:center;justify-content:center;border:2px solid var(--gold);background:linear-gradient(#2b2411,#050403);color:var(--cream);cursor:pointer;box-shadow:inset 0 1px 0 rgba(247,232,180,.3),0 4px 0 #5a4210,0 8px 12px rgba(0,0,0,.6)}
@@ -70,16 +97,41 @@ ol{margin:0;padding-left:24px;color:var(--cream)}li{padding:3px 0}
 
 <div id="panel" class="hide">
   <div class="st" id="st"></div>
-  <div class="card">
+  <button class="sec recx" id="recx">✕ Sair da gravação</button>
+  <div class="card" id="stage">
+    <div class="recprize" id="recPrize"></div>
     <div class="lbl" id="lbl">Sorteado</div>
     <div class="name" id="name">@???</div>
     <button id="go">SORTEAR AGORA</button>
     <label class="ck"><input type="checkbox" id="excl" checked> Tirar o sorteado da lista depois</label>
     <button class="sec" id="snd" style="margin-top:16px">🔊 Som: ligado</button>
+    <button class="sec" id="rec" style="margin-top:12px">🎬 Modo gravação</button>
   </div>
   <div class="card plain" style="margin-top:0">
     <div class="meta"><span><b id="cnt">0</b> participantes (ao vivo)</span><button class="sec" id="clear">Limpar tudo</button></div>
+    <input id="q" placeholder="Buscar @…" autocapitalize="none" autocorrect="off" style="margin-bottom:10px">
     <div class="chips" id="chips"></div>
+    <div class="tiny" id="more" style="margin-top:8px"></div>
+    <div class="ed hide" id="ed">
+      <div class="tiny" style="margin-bottom:8px">Editar @ selecionado</div>
+      <input id="edIn" autocapitalize="none" autocorrect="off" maxlength="40">
+      <div class="edrow"><button class="sec" id="edSave">Salvar</button><button class="sec" id="edDel">Remover</button><button class="sec" id="edX">Cancelar</button></div>
+    </div>
+  </div>
+  <div class="card plain" style="margin-top:0">
+    <h2>Prêmios</h2>
+    <div class="tiny" style="margin-bottom:12px">Toque em “Oculto” para mostrar o prêmio na página pública.</div>
+    <input id="pn" placeholder="Nome do prêmio (ex.: Skin lendária)" maxlength="80" style="margin-bottom:8px">
+    <div class="row">
+      <input id="pq" type="number" min="1" max="9999" value="1" inputmode="numeric" aria-label="Quantidade" style="flex:none;width:92px;text-align:center">
+      <button class="sec" id="pph">📷 Foto</button>
+      <button class="sec" id="pa" style="margin-left:auto">Adicionar</button>
+    </div>
+    <input id="pf" type="file" accept="image/*" class="hide">
+    <input id="pf2" type="file" accept="image/*" class="hide">
+    <div class="tiny" id="pphn" style="margin-top:6px">Quantidade e foto são opcionais.</div>
+    <div id="plist"></div>
+    <div class="tiny" id="nopr" style="margin-top:10px">Nenhum prêmio ainda.</div>
   </div>
   <div class="card plain" style="margin-top:0">
     <div class="meta"><h2 style="margin:0">Ganhadores</h2><button class="sec" id="clearw">Limpar histórico</button></div>
@@ -91,11 +143,11 @@ ol{margin:0;padding-left:24px;color:var(--cream)}li{padding:3px 0}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, query, orderBy, serverTimestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, addDoc, setDoc, updateDoc, deleteDoc, doc, query, where, orderBy, serverTimestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
 const $ = id => document.getElementById(id);
-let users = [], busy = false, unsubs = [];
+let users = [], prizes = [], sel = null, busy = false, unsubs = [];
 
 $("in").onclick = async () => {
   $("err").textContent = "";
@@ -113,10 +165,14 @@ onAuthStateChanged(auth, u => {
   unsubs.push(onSnapshot(collection(db, "entries"), s => {
     users = s.docs.map(d => d.data().user);
     $("cnt").textContent = users.length;
-    $("chips").innerHTML = "";
-    users.forEach(x => { const c = document.createElement("span"); c.className = "chip"; c.textContent = x; $("chips").appendChild(c); });
+    if (sel && !users.includes(sel)) closeEd();
+    renderChips();
     $("go").disabled = busy || !users.length;
   }, () => { $("err").textContent = "Sem permissão. Confira as regras e o e-mail de admin."; }));
+  unsubs.push(onSnapshot(collection(db, "prizes"), s => {
+    prizes = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order || 0) - (b.order || 0));
+    renderPrizes();
+  }));
   unsubs.push(onSnapshot(query(collection(db, "winners"), orderBy("at", "desc")), s => {
     $("hist").innerHTML = "";
     s.docs.forEach(d => { const li = document.createElement("li"); li.textContent = d.data().user; $("hist").appendChild(li); });
@@ -205,6 +261,124 @@ function twoTap(btn, run, okText) {
 }
 twoTap($("clear"), () => wipe("entries"), "Participantes apagados.");
 twoTap($("clearw"), () => wipe("winners"), "Histórico apagado.");
+
+/* ---------- editar @ ---------- */
+function renderChips() {
+  const q = $("q").value.trim().toLowerCase().replace(/^@+/, "");
+  const list = q ? users.filter(u => u.includes(q)) : users, box = $("chips");
+  box.innerHTML = "";
+  list.slice(0, 300).forEach(u => {
+    const c = document.createElement("span");
+    c.className = "chip" + (u === sel ? " sel" : ""); c.textContent = u;
+    c.onclick = () => openEd(u);
+    box.appendChild(c);
+  });
+  $("more").textContent = list.length > 300 ? "Mostrando 300 de " + list.length + ". Use a busca para achar um @." : (q && !list.length ? "Nenhum @ encontrado." : "");
+}
+function openEd(u) { sel = u; $("ed").classList.remove("hide"); $("edIn").value = u; renderChips(); }
+function closeEd() { sel = null; $("ed").classList.add("hide"); renderChips(); }
+$("q").oninput = renderChips;
+$("edX").onclick = closeEd;
+$("edSave").onclick = async () => {
+  if (!sel) return;
+  const v = $("edIn").value.trim().replace(/^@+/, "").toLowerCase(), nu = "@" + v;
+  if (!/^[a-z0-9._]{2,30}$/.test(v)) return msg("@ inválido (letras, números, ponto e _).", true);
+  if (nu === sel) return closeEd();
+  if (users.includes(nu)) return msg("Esse @ já está na lista.", true);
+  try {
+    const b = writeBatch(db);
+    b.set(doc(db, "entries", nu), { user: nu, createdAt: serverTimestamp() });
+    b.delete(doc(db, "entries", sel));
+    await b.commit(); msg("@ atualizado."); closeEd();
+  } catch (e) { msg("Erro: " + ((e && (e.code || e.message)) || e), true); }
+};
+twoTap($("edDel"), async () => { const u = sel; if (!u) return 0; await deleteDoc(doc(db, "entries", u)); closeEd(); return 1; }, "@ removido.");
+
+/* ---------- prêmios ---------- */
+const errMsg = e => "Erro: " + ((e && (e.code || e.message)) || e);
+function fileToPhoto(file) {
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const S = 400, c = document.createElement("canvas"); c.width = c.height = S;
+      const x = c.getContext("2d"); x.fillStyle = "#000"; x.fillRect(0, 0, S, S);
+      const m = Math.min(img.width, img.height), sx = (img.width - m) / 2, sy = (img.height - m) / 2;
+      x.drawImage(img, sx, sy, m, m, 0, 0, S, S); URL.revokeObjectURL(url);
+      let q = .82, d = c.toDataURL("image/jpeg", q);
+      while (d.length > 150000 && q > .4) { q -= .1; d = c.toDataURL("image/jpeg", q); }
+      res(d);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("imagem inválida")); };
+    img.src = url;
+  });
+}
+const clampQty = v => Math.max(1, Math.min(9999, parseInt(v, 10) || 1));
+let newPhoto = "", photoFor = null;
+$("pph").onclick = () => $("pf").click();
+$("pf").onchange = async () => {
+  const f = $("pf").files[0]; $("pf").value = ""; if (!f) return;
+  try { newPhoto = await fileToPhoto(f); $("pph").textContent = "📷 Foto ✓"; $("pphn").textContent = "Foto pronta. Toque em Adicionar."; }
+  catch (e) { msg("Não consegui ler essa foto.", true); }
+};
+$("pf2").onchange = async () => {
+  const f = $("pf2").files[0]; $("pf2").value = ""; if (!f || !photoFor) return;
+  try { const d = await fileToPhoto(f); await updateDoc(doc(db, "prizes", photoFor), { photo: d }); msg("Foto atualizada."); }
+  catch (e) { msg(errMsg(e), true); }
+};
+function renderPrizes() {
+  const box = $("plist"); box.innerHTML = "";
+  $("nopr").style.display = prizes.length ? "none" : "block";
+  prizes.forEach(p => {
+    const card = document.createElement("div"); card.className = "pcard";
+    const top = document.createElement("div"); top.className = "ptop";
+    const th = document.createElement("button"); th.className = "pth"; th.setAttribute("aria-label", "Trocar foto");
+    if (p.photo) { const im = document.createElement("img"); im.src = p.photo; im.alt = ""; th.appendChild(im); } else th.textContent = "📷";
+    th.onclick = () => { photoFor = p.id; $("pf2").click(); };
+    const inp = document.createElement("input"); inp.value = p.name || ""; inp.maxLength = 80;
+    inp.onchange = async () => {
+      const v = inp.value.trim(); if (!v) { inp.value = p.name; return; }
+      try { await updateDoc(doc(db, "prizes", p.id), { name: v }); } catch (e) { msg(errMsg(e), true); }
+    };
+    top.appendChild(th); top.appendChild(inp);
+    const bot = document.createElement("div"); bot.className = "pbot";
+    const ql = document.createElement("label"); ql.className = "qty"; ql.appendChild(document.createTextNode("Qtd"));
+    const qi = document.createElement("input"); qi.type = "number"; qi.min = 1; qi.max = 9999; qi.inputMode = "numeric"; qi.value = p.qty || 1;
+    qi.onchange = async () => {
+      const v = clampQty(qi.value); qi.value = v;
+      try { await updateDoc(doc(db, "prizes", p.id), { qty: v }); } catch (e) { msg(errMsg(e), true); }
+    };
+    ql.appendChild(qi); bot.appendChild(ql);
+    const tg = document.createElement("button"); tg.className = "sec tg" + (p.visible ? " on" : ""); tg.textContent = p.visible ? "👁 Visível" : "Oculto";
+    tg.onclick = async () => { try { await updateDoc(doc(db, "prizes", p.id), { visible: !p.visible }); } catch (e) { msg(errMsg(e), true); } };
+    bot.appendChild(tg);
+    if (p.photo) {
+      const rm = document.createElement("button"); rm.className = "sec"; rm.textContent = "Tirar foto";
+      rm.onclick = async () => { try { await updateDoc(doc(db, "prizes", p.id), { photo: "" }); } catch (e) { msg(errMsg(e), true); } };
+      bot.appendChild(rm);
+    }
+    const del = document.createElement("button"); del.className = "sec"; del.textContent = "Excluir";
+    twoTap(del, async () => { await deleteDoc(doc(db, "prizes", p.id)); return 1; }, "Prêmio excluído.");
+    bot.appendChild(del);
+    card.appendChild(top); card.appendChild(bot); box.appendChild(card);
+  });
+  const names = prizes.filter(p => p.visible && p.name).map(p => ((p.qty || 1) > 1 ? p.qty + "× " : "") + p.name);
+  const rp = $("recPrize"); rp.textContent = names.length ? "🏆 " + names.join(" • ") : ""; rp.classList.toggle("has", names.length > 0);
+}
+async function addPrize() {
+  const n = $("pn").value.trim(); if (!n) return msg("Escreva o nome do prêmio.", true);
+  try {
+    await addDoc(collection(db, "prizes"), { name: n, qty: clampQty($("pq").value), photo: newPhoto, visible: false, order: Date.now() });
+    $("pn").value = ""; $("pq").value = 1; newPhoto = ""; $("pph").textContent = "📷 Foto"; $("pphn").textContent = "Quantidade e foto são opcionais.";
+    msg("Prêmio adicionado. Toque em “Oculto” para mostrar no site.");
+  } catch (e) { msg(errMsg(e), true); }
+}
+$("pa").onclick = addPrize;
+$("pn").onkeydown = e => { if (e.key === "Enter") addPrize(); };
+
+/* ---------- modo gravação ---------- */
+$("rec").onclick = () => { document.body.classList.add("rec"); window.scrollTo(0, 0); };
+$("recx").onclick = () => document.body.classList.remove("rec");
+
 </script>
 <script>
 (function () {
