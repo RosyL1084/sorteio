@@ -88,6 +88,28 @@ body.rec .name{font-size:clamp(38px,13vw,76px);min-height:110px;display:flex;ali
 .dt .ico{height:26px}
 h2 .ico{height:30px}
 button .ico{height:22px;margin-right:6px}
+.pimg{flex:none;width:44px;height:44px;border-radius:10px;object-fit:cover;border:2px solid var(--gold);background:#000}
+.pimg.nophoto{display:flex;align-items:center;justify-content:center;font-size:20px;border-style:dashed;opacity:.8}
+body.rec .nowc .pimg.nophoto{font-size:30px}
+.now{margin-bottom:16px}
+.nowlbl{color:#a99a68;font-size:14px;margin-bottom:6px}
+.nowbox{padding:8px 12px;border:2px solid var(--gold);border-radius:14px;background:linear-gradient(#000,#14100a);box-shadow:inset 0 4px 8px rgba(0,0,0,.7);text-align:left}
+.nowc{display:flex;align-items:center;gap:10px;flex:1;min-width:0;color:var(--cream);font-size:20px;line-height:1.2}
+.nowc .pname{flex:1;min-width:0;word-break:break-word}
+.nowc .pq{flex:none;font-size:16px;color:var(--gold);border:1.5px solid var(--gold);border-radius:99px;padding:0 9px}
+.nowc .ph{color:#7d7048;font-size:17px}
+.nowlist{margin-top:8px;max-height:240px;overflow-y:auto;border:1.5px solid #3a2f12;border-radius:12px;background:#0a0804;text-align:left}
+.nowrow{display:flex;align-items:center;gap:10px;padding:8px 10px;cursor:pointer;color:var(--cream);font-size:18px;-webkit-tap-highlight-color:transparent}
+.nowrow+.nowrow{border-top:1px solid #2a2210}
+.nowrow.sel{background:#2b2411}
+.nowrow .pname{flex:1;min-width:0;word-break:break-word}
+.nowrow .pq{flex:none;font-size:15px;color:var(--gold);border:1.5px solid var(--gold);border-radius:99px;padding:0 8px}
+.nowrow .none{color:#a99a68}
+body.rec .nowlbl{font-size:16px}
+body.rec .nowbox{padding:12px 14px;border-radius:18px}
+body.rec .nowc{font-size:clamp(22px,6.2vw,30px);gap:14px}
+body.rec .nowc .pimg{width:clamp(64px,18vw,84px);height:clamp(64px,18vw,84px);border-radius:14px}
+body.rec .nowc .pq{font-size:22px}
 .tiny{font-size:14px;color:#8a7c4f}
 #out{display:block;margin:6px auto 0}
 .musbtn{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:25;width:46px;height:46px;margin:0;padding:0;border-radius:50%;font-size:20px;letter-spacing:0;line-height:1;display:flex;align-items:center;justify-content:center;border:2px solid var(--gold);background:linear-gradient(#2b2411,#050403);color:var(--cream);cursor:pointer;box-shadow:inset 0 1px 0 rgba(247,232,180,.3),0 4px 0 #5a4210,0 8px 12px rgba(0,0,0,.6)}
@@ -114,7 +136,11 @@ button .ico{height:22px;margin-right:6px}
   <div class="st" id="st"></div>
   <button class="sec recx" id="recx">✕ Sair da gravação</button>
   <div class="card" id="stage">
-    <div class="recprize" id="recPrize"></div>
+    <div class="now" id="now">
+      <div class="nowlbl">Sorteando agora</div>
+      <div class="dh nowbox" id="nowbox" role="button" tabindex="0" aria-expanded="false"><span class="nowc" id="nowc"><span class="ph">Toque para escolher o prêmio</span></span><span class="chev"></span></div>
+      <div class="nowlist hide" id="nowlist"></div>
+    </div>
     <div class="lbl" id="lbl">Sorteado</div>
     <div class="name" id="name">@???</div>
     <button id="go">SORTEAR AGORA</button>
@@ -167,7 +193,8 @@ import { getFirestore, collection, onSnapshot, addDoc, setDoc, updateDoc, delete
 import { firebaseConfig } from "./firebase-config.js";
 const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
 const $ = id => document.getElementById(id);
-let users = [], prizes = [], sel = null, busy = false, unsubs = [];
+let users = [], prizes = [], sel = null, busy = false, unsubs = [], nowId = null;
+try { nowId = localStorage.getItem("sorteio_agora") || null; } catch (e) {}
 
 $("in").onclick = async () => {
   $("err").textContent = "";
@@ -195,7 +222,7 @@ onAuthStateChanged(auth, u => {
   }));
   unsubs.push(onSnapshot(query(collection(db, "winners"), orderBy("at", "desc")), s => {
     $("hist").innerHTML = "";
-    s.docs.forEach(d => { const li = document.createElement("li"); li.textContent = d.data().user; $("hist").appendChild(li); });
+    s.docs.forEach(d => { const li = document.createElement("li"); const w = d.data(); li.textContent = w.user + (w.prize ? " — " + w.prize : ""); $("hist").appendChild(li); });
     $("nohist").style.display = s.size ? "none" : "block";
   }));
 });
@@ -211,7 +238,7 @@ $("go").onclick = () => {
     if (i < 28) { el.textContent = pool[Math.floor(Math.random() * pool.length)]; i++; setTimeout(tick, 50 + i * i * 0.3); }
     else {
       el.textContent = win; el.classList.add("win"); $("lbl").textContent = "🎉 Ganhador(a)!"; celebrate();
-      addDoc(collection(db, "winners"), { user: win, at: serverTimestamp() });
+      addDoc(collection(db, "winners"), { user: win, prize: ((prizes.find(p => p.id === nowId) || {}).name) || "", at: serverTimestamp() });
       if ($("excl").checked) deleteDoc(doc(db, "entries", win));
       busy = false; $("go").disabled = false;
     }
@@ -381,9 +408,40 @@ function renderPrizes() {
     bot.appendChild(del);
     card.appendChild(top); card.appendChild(bot); box.appendChild(card);
   });
-  const names = prizes.filter(p => p.visible && p.name).map(p => ((p.qty || 1) > 1 ? p.qty + "× " : "") + p.name);
-  const rp = $("recPrize"); rp.textContent = names.length ? "🏆 " + names.join(" • ") : ""; rp.classList.toggle("has", names.length > 0);
+  renderNow();
 }
+/* ---------- prêmio sorteando agora ---------- */
+function fillPrize(el, p) {
+  if (p.photo) { const im = document.createElement("img"); im.className = "pimg"; im.alt = ""; im.src = p.photo; el.appendChild(im); }
+  else { const ph = document.createElement("div"); ph.className = "pimg nophoto"; ph.textContent = "🖼️"; el.appendChild(ph); }
+  const t = document.createElement("div"); t.className = "pname"; t.textContent = p.name || ""; el.appendChild(t);
+  if ((p.qty || 1) > 1) { const q = document.createElement("div"); q.className = "pq"; q.textContent = "×" + p.qty; el.appendChild(q); }
+}
+function saveNow() { try { if (nowId) localStorage.setItem("sorteio_agora", nowId); else localStorage.removeItem("sorteio_agora"); } catch (e) {} }
+function closeNow() { $("nowlist").classList.add("hide"); $("nowbox").setAttribute("aria-expanded", "false"); }
+function renderNow() {
+  let cur = prizes.find(p => p.id === nowId);
+  if (nowId && !cur) { nowId = null; saveNow(); }
+  const c = $("nowc"); c.innerHTML = "";
+  if (cur) fillPrize(c, cur); else { const ph = document.createElement("span"); ph.className = "ph"; ph.textContent = prizes.length ? "Toque para escolher o prêmio" : "Cadastre um prêmio no painel"; c.appendChild(ph); }
+  const box = $("nowlist"); box.innerHTML = "";
+  const none = document.createElement("div"); none.className = "nowrow" + (cur ? "" : " sel");
+  none.innerHTML = '<div class="pname none">Nenhum (sem prêmio na tela)</div>';
+  none.onclick = () => { nowId = null; saveNow(); renderNow(); closeNow(); };
+  box.appendChild(none);
+  prizes.forEach(p => {
+    const row = document.createElement("div"); row.className = "nowrow" + (p.id === nowId ? " sel" : "");
+    fillPrize(row, p);
+    row.onclick = () => { nowId = p.id; saveNow(); renderNow(); closeNow(); };
+    box.appendChild(row);
+  });
+}
+function toggleNow() {
+  const open = $("nowlist").classList.contains("hide");
+  $("nowlist").classList.toggle("hide", !open); $("nowbox").setAttribute("aria-expanded", open ? "true" : "false");
+}
+$("nowbox").onclick = toggleNow;
+$("nowbox").onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleNow(); } };
 async function addPrize() {
   const n = $("pn").value.trim(); if (!n) return msg("Escreva o nome do prêmio.", true);
   try {
