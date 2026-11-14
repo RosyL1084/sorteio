@@ -31,10 +31,10 @@ button:active:not(:disabled){transform:translateY(4px);box-shadow:inset 0 1px 0 
 button:disabled{opacity:.5}
 button.sec{white-space:nowrap;width:auto;padding:8px 14px;font-size:15px;letter-spacing:.03em;box-shadow:inset 0 1px 0 rgba(247,232,180,.25),0 3px 0 #5a4210}
 #err{min-height:22px;margin-top:12px;color:var(--er);font-size:16px}
-.name{font-size:clamp(28px,9vw,42px);word-break:break-all;min-height:56px;line-height:1.2;color:var(--cream);text-shadow:0 3px 0 #000}
+.name{font-size:clamp(28px,9vw,42px);white-space:nowrap;height:56px;line-height:56px;color:var(--cream);text-shadow:0 3px 0 #000}
 .name.win{color:var(--gold);text-shadow:0 3px 0 #000,0 0 22px rgba(232,177,58,.55);animation:pop .5s}
 @keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
-.lbl{color:#a99a68;font-size:16px}
+.lbl{color:#a99a68;font-size:16px;height:28px;display:flex;align-items:center;justify-content:center}
 #go{margin-top:12px;font-size:24px}
 label.ck{display:flex;gap:8px;align-items:center;justify-content:center;color:#a99a68;font-size:15px;margin-top:20px}
 label.ck input{width:auto;margin:0;accent-color:var(--gold);box-shadow:none}
@@ -66,7 +66,7 @@ body.rec #stage .btnrow,body.rec .lbl{display:none}
 body.rec #stage .now{margin:0}
 body.rec #stage #go{margin:0}
 body.rec .recprize.has{display:block}
-body.rec .name{font-size:clamp(38px,13vw,76px);min-height:120px;margin:0;padding:6px 0;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1}
+body.rec .name{font-size:clamp(38px,13vw,76px);height:120px;line-height:120px;margin:0;padding:0;display:block;text-align:center}
 .pcard{margin-top:12px;padding:10px;border:1.5px solid #3a2f12;border-radius:14px;background:#0a0804}
 .ptop{display:flex;gap:10px;align-items:center}
 .ptop input{margin:0;text-align:left;flex:1;min-width:0;padding:10px 12px;font-size:17px}
@@ -252,9 +252,9 @@ $("go").onclick = () => {
   const win = pool[buf[0] % pool.length]; let i = 0;
   el.classList.remove("win"); $("lbl").textContent = "Sorteando…";
   (function tick() {
-    if (i < 28) { el.textContent = pool[Math.floor(Math.random() * pool.length)]; i++; setTimeout(tick, 50 + i * i * 0.3); }
+    if (i < 28) { el.textContent = pool[Math.floor(Math.random() * pool.length)]; fitName(); i++; setTimeout(tick, 50 + i * i * 0.3); }
     else {
-      el.textContent = win; el.classList.add("win"); $("lbl").innerHTML = '<img class="ico" alt="" src="' + IC.win + '">Ganhador(a)!'; celebrate();
+      el.textContent = win; fitName(); el.classList.add("win"); $("lbl").innerHTML = '<img class="ico" alt="" src="' + IC.win + '">Ganhador(a)!'; celebrate();
       addDoc(collection(db, "winners"), { user: win, prize: ((prizes.find(p => p.id === nowId) || {}).name) || "", at: serverTimestamp() });
       if ($("excl").checked) deleteDoc(doc(db, "entries", win));
       busy = false; $("go").disabled = false;
@@ -290,6 +290,13 @@ function confetti() {
     if (dt < 4200) requestAnimationFrame(f); else x.clearRect(0, 0, c.width, c.height);
   })(t0);
 }
+function fitName() {
+  const el = $("name"); el.style.fontSize = "";
+  const w = el.clientWidth; if (!w) return;
+  const base = parseFloat(getComputedStyle(el).fontSize), sw = el.scrollWidth;
+  if (sw > w) el.style.fontSize = Math.max(12, Math.floor(base * w / sw * 0.97)) + "px";
+}
+window.addEventListener("resize", fitName);
 function celebrate() {
   confetti();
   if (soundOn && window.duckMusic) window.duckMusic();
@@ -473,8 +480,8 @@ $("pa").onclick = addPrize;
 $("pn").onkeydown = e => { if (e.key === "Enter") addPrize(); };
 
 /* ---------- modo gravação ---------- */
-$("rec").onclick = () => { document.body.classList.add("rec"); window.scrollTo(0, 0); };
-$("recx").onclick = () => document.body.classList.remove("rec");
+$("rec").onclick = () => { document.body.classList.add("rec"); window.scrollTo(0, 0); fitName(); };
+$("recx").onclick = () => { document.body.classList.remove("rec"); fitName(); };
 
 </script>
 <script>
