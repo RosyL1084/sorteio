@@ -73,6 +73,17 @@ body.rec .name{font-size:clamp(38px,13vw,76px);min-height:110px;display:flex;ali
 .pbot .qty{display:flex;align-items:center;gap:6px;color:#a99a68;font-size:15px}
 .pbot .qty input{width:74px;margin:0;padding:8px;font-size:16px;text-align:center}
 .pbot button.sec{padding:8px 10px;font-size:14px;white-space:nowrap}
+.drawer{display:grid;grid-template-rows:1fr}
+.drawer.anim{transition:grid-template-rows .28s ease}
+.drawer.closed{grid-template-rows:0fr}
+.dbody{overflow:hidden;min-height:0}
+.dh{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.chev{flex:none;width:10px;height:10px;border-right:3px solid var(--gold);border-bottom:3px solid var(--gold);transform:rotate(45deg);margin:-4px 6px 0 0;transition:transform .25s,margin .25s}
+.dh[aria-expanded="false"] .chev{transform:rotate(135deg);margin:0 6px 0 0}
+.dh:active .chev{opacity:.6}
+.dt{color:#a99a68;font-size:16px}
+.dt b{color:var(--cream)}
+.dinner{padding-top:12px}
 .tiny{font-size:14px;color:#8a7c4f}
 #out{display:block;margin:6px auto 0}
 .musbtn{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:25;width:46px;height:46px;margin:0;padding:0;border-radius:50%;font-size:20px;letter-spacing:0;line-height:1;display:flex;align-items:center;justify-content:center;border:2px solid var(--gold);background:linear-gradient(#2b2411,#050403);color:var(--cream);cursor:pointer;box-shadow:inset 0 1px 0 rgba(247,232,180,.3),0 4px 0 #5a4210,0 8px 12px rgba(0,0,0,.6)}
@@ -108,7 +119,9 @@ body.rec .name{font-size:clamp(38px,13vw,76px);min-height:110px;display:flex;ali
     <button class="sec" id="rec" style="margin-top:12px">🎬 Modo gravação</button>
   </div>
   <div class="card plain" style="margin-top:0">
-    <div class="meta"><span><b id="cnt">0</b> participantes (ao vivo)</span><button class="sec" id="clear">Limpar tudo</button></div>
+    <div class="dh" data-d="part" role="button" tabindex="0" aria-expanded="true"><span class="dt"><b id="cnt">0</b> participantes (ao vivo)</span><span class="chev"></span></div>
+    <div class="drawer" id="d-part"><div class="dbody"><div class="dinner">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="sec" id="clear">Limpar tudo</button></div>
     <input id="q" placeholder="Buscar @…" autocapitalize="none" autocorrect="off" style="margin-bottom:10px">
     <div class="chips" id="chips"></div>
     <div class="tiny" id="more" style="margin-top:8px"></div>
@@ -117,9 +130,11 @@ body.rec .name{font-size:clamp(38px,13vw,76px);min-height:110px;display:flex;ali
       <input id="edIn" autocapitalize="none" autocorrect="off" maxlength="40">
       <div class="edrow"><button class="sec" id="edSave">Salvar</button><button class="sec" id="edDel">Remover</button><button class="sec" id="edX">Cancelar</button></div>
     </div>
+    </div></div></div>
   </div>
   <div class="card plain" style="margin-top:0">
-    <h2>Prêmios</h2>
+    <div class="dh" data-d="prem" role="button" tabindex="0" aria-expanded="true"><h2 style="margin:0">Prêmios</h2><span class="chev"></span></div>
+    <div class="drawer" id="d-prem"><div class="dbody"><div class="dinner">
     <div class="tiny" style="margin-bottom:12px">Toque em “Oculto” para mostrar o prêmio na página pública.</div>
     <input id="pn" placeholder="Nome do prêmio (ex.: Skin lendária)" maxlength="80" style="margin-bottom:8px">
     <div class="row">
@@ -132,6 +147,7 @@ body.rec .name{font-size:clamp(38px,13vw,76px);min-height:110px;display:flex;ali
     <div class="tiny" id="pphn" style="margin-top:6px">Quantidade e foto são opcionais.</div>
     <div id="plist"></div>
     <div class="tiny" id="nopr" style="margin-top:10px">Nenhum prêmio ainda.</div>
+    </div></div></div>
   </div>
   <div class="card plain" style="margin-top:0">
     <div class="meta"><h2 style="margin:0">Ganhadores</h2><button class="sec" id="clearw">Limpar histórico</button></div>
@@ -415,6 +431,21 @@ $("recx").onclick = () => document.body.classList.remove("rec");
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) { wasPlaying = !a.paused; a.pause(); }
     else if (on && wasPlaying) a.play().catch(function () {});
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll(".dh[data-d]").forEach(function (h) {
+    var id = h.getAttribute("data-d"), k = "sorteio_d_" + id, d = document.getElementById("d-" + id), open = true;
+    if (!d) return;
+    try { if (localStorage.getItem(k) === "0") open = false; } catch (e) {}
+    function paint() { d.classList.toggle("closed", !open); h.setAttribute("aria-expanded", open ? "true" : "false"); }
+    function tog() { open = !open; try { localStorage.setItem(k, open ? "1" : "0"); } catch (e) {} paint(); }
+    paint();
+    setTimeout(function () { d.classList.add("anim"); }, 80);
+    h.addEventListener("click", tog);
+    h.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(); } });
   });
 })();
 </script>
