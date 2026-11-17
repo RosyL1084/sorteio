@@ -486,15 +486,15 @@ $("recx").onclick = () => { document.body.classList.remove("rec"); fitName(); };
 </script>
 <script>
 (function () {
-  /* Playlist: para adicionar músicas, coloque o arquivo MP3 no GitHub e inclua uma linha aqui. */
+  /* Playlist: para adicionar músicas, coloque o arquivo MP3 no GitHub e inclua uma linha aqui. "v" = volume da faixa (1 = normal, menor = mais baixo). */
   var TRACKS = [
-    { n: "Menu Brawlympus", s: "musica.mp3" },
-    { n: "Steam Punk", s: "steampunk.mp3" },
-    { n: "Circo", s: "circo.mp3" },
-    { n: "Hindu", s: "hindu.mp3" },
-    { n: "Jae Love", s: "jae-love.mp3" },
-    { n: "K-Pop", s: "kpop.mp3" },
-    { n: "Brawzaar", s: "brawzaar.mp3" }
+    { n: "Brawlympus", s: "musica.mp3" },
+    { n: "Steam Punk", s: "steampunk.mp3", v: 0.6 },
+    { n: "Circo", s: "circo.mp3", v: 0.6 },
+    { n: "Hindu", s: "hindu.mp3", v: 0.6 },
+    { n: "Jae Love", s: "jae-love.mp3", v: 0.6 },
+    { n: "K-Pop", s: "kpop.mp3", v: 0.6 },
+    { n: "Brawzaar", s: "brawzaar.mp3", v: 0.6 }
   ];
   var VOL = 0.4, DUCK = 0.08, XF = 2.5, XFMS = 1600;   /* volume, volume baixo, segundos antes do fim, ms da troca */
   var master = VOL, idx = 0, rep = false, on = true, wasPlaying = false, xfading = false, pre = null, mfi;
@@ -503,11 +503,11 @@ $("recx").onclick = () => { document.body.classList.remove("rec"); fitName(); };
   try { on = localStorage.getItem("sorteio_musica") !== "off"; rep = localStorage.getItem("sorteio_repetir") === "on"; } catch (e) {}
   function save(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   function clamp(v) { return Math.max(0, Math.min(1, v)); }
-  function apply(el) { el.volume = clamp(master * (el._g == null ? 1 : el._g)); }
+  function apply(el) { el.volume = clamp(master * (el._g == null ? 1 : el._g) * (el._v || 1)); }
   function loops() { return rep || TRACKS.length === 1; }
 
   function mk(i) {
-    var el = new Audio(TRACKS[i].s); el.preload = "auto"; el._g = 1; el._i = i; el.loop = loops(); apply(el);
+    var el = new Audio(TRACKS[i].s); el.preload = "auto"; el._g = 1; el._i = i; el._v = TRACKS[i].v || 1; el.loop = loops(); apply(el);
     el.addEventListener("timeupdate", function () { tick(el); });
     el.addEventListener("ended", function () { if (el === cur && TRACKS.length > 1 && !rep) next(false); });
     return el;
